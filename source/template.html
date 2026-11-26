@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang=en>
+<head>
+<meta charset=utf-8>
+<title>Underwater Adventure w/ FKJ</title>
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name=theme-color content=#03131c>
+<style>
+html{background:#03131c}
+body{
+  position:fixed;top:0;left:0;width:100%;height:100%;margin:0;overflow:hidden;
+  background:radial-gradient(#0b3a4d,#03131c 70%);
+  font:700 clamp(11px,.6vw + .8vh,30px)/1.4 system-ui,sans-serif;color:#e8fbff;
+  -webkit-user-select:none;user-select:none;touch-action:none;
+  overscroll-behavior:none;
+}
+@media (orientation:portrait) and (pointer:coarse){
+  body{width:100dvh;height:100dvw;transform-origin:0 0;transform:rotate(90deg) translateY(-100%);}
+}
+canvas{position:absolute;width:100%;height:100%;touch-action:none;cursor:crosshair;transition:filter 1s,transform 1s,opacity 2s}
+body:not(.g) canvas{filter:blur(1vmax) brightness(.5);transform:scale(1.06)}
+.l canvas{opacity:0}
+#m{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:min(1.8em,4vmin);padding:1em 1em 4.5em;text-align:center;background:radial-gradient(#03131c00 30%,#03131ccc);transition:opacity .5s,visibility .5s;overflow:auto}
+.g #m,.paused #m{opacity:0;visibility:hidden}
+.paused #pm{opacity:1;visibility:visible}
+h1{margin:0;font:900 clamp(1.8em,5vw,4em)/.95 system-ui,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:#0000;background:linear-gradient(#fff 25%,#7ff3ff 60%,#14a9c4);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 .06em .2em #000c);text-align:center}
+h1 span{display:block;font:700 .28em/.9 system-ui,sans-serif;letter-spacing:.22em;color:#7ff3ff;background:none;-webkit-background-clip:unset;background-clip:unset;filter:none;margin-top:.4em}
+p{margin:0}
+#a{display:grid;width:30em;max-width:95vw}
+#a>*{grid-area:1/1;transition:opacity .8s,visibility .8s}
+#s,#w,#q,#k,#h{font-size:.75em;letter-spacing:.11em;text-transform:uppercase}
+#w{margin-top:1em;color:#7ff3ff;text-wrap:balance}
+#p{height:.5em;margin:.4em 0 1em;overflow:hidden;border-radius:1em;background:#03131c;box-shadow:0 0 0 2px #7ff3ff80,0 0 1.5em #14a9c4}
+#b{display:block;height:100%;background:linear-gradient(90deg,#14a9c4,#9ff6ff);transform:scaleX(0);transform-origin:0;will-change:transform}
+.e #p{visibility:hidden}
+.e #s{font-size:1.05em;letter-spacing:0;text-transform:none}
+button,a{display:flex;align-items:center;justify-content:center;gap:.5em;padding:.75em 1.2em;border:0;border-radius:.55em;background:#fff;box-shadow:inset 0 -.18em #0003,0 .3em 1em #0009;font:800 .95em/1.2 system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:#03222d;cursor:pointer;transition:transform .12s,filter .12s}
+button:hover,a:hover{transform:translateY(-.1em);filter:brightness(1.12)}
+button:active,a:active{transform:translateY(.08em);filter:brightness(.92)}
+:focus-visible{outline:3px solid #fff;outline-offset:3px}
+#g{display:grid;gap:min(1em,2.5vmin)}
+#d{padding:.9em;background:linear-gradient(#9ff6ff,#19c3d6);font-size:1.25em;box-shadow:inset 0 -.2em #0003,0 0 2em #19c3d6b3}
+#f{position:absolute;left:0;right:0;bottom:1em;display:flex;justify-content:center;gap:.8em;font-size:.72em;flex-wrap:wrap;padding:0 1em}
+a+a{background:#ff5e5b;color:#fff}
+svg{width:1.4em;height:1.4em;fill:currentColor}
+#q,#k,#h,#hud,#pm,#joyL,#joyR,#mBtns{box-sizing:border-box}
+#q,#k,#h{padding:.9em 1.2em;border-radius:.7em;background:#03131cb3}
+#q{display:flex;align-items:center;gap:.35em;padding:.35em}
+#q span{flex:1;color:#7ff3ff;font-size:.9em}
+#q button{flex:1.2;padding:.6em 0;background:none;box-shadow:none;color:#e8fbff}
+#q button:hover{background:#7ff3ff33}
+#q .on{background:linear-gradient(#9ff6ff,#19c3d6);box-shadow:inset 0 -.2em #0003;color:#03222d;pointer-events:none}
+#k{display:flex;justify-content:center;gap:1.6em;text-align:left}
+#k>div{display:grid;grid-template-columns:auto auto;align-content:start;align-items:center;gap:.5em .7em}
+#k i{display:flex;justify-self:end;align-items:center;gap:.2em;font-style:normal}
+#k b{min-width:1em;padding:.18em .45em;border-radius:.3em;background:#e8fbff;box-shadow:inset 0 -.12em #0004;color:#03222d;text-align:center;font-size:.9em}
+#h{display:none}
+@media (pointer:coarse),(max-height:30em){#k{display:none}}
+@media (pointer:coarse){#h{display:block}}
+#o{position:absolute;top:.6em;right:.6em;display:none;padding:.3em .6em;background:#03222dd9;box-shadow:inset 0 0 0 2px #7ff3ff,0 .3em 1em #0009;font-size:1.2em;color:#e8fbff;opacity:.85}
+.g #o{display:flex}
+.p #o{display:none}
+#i{position:absolute;top:.8em;left:.9em;margin:0;font:.75em/1.5 ui-monospace,Consolas,monospace;white-space:pre-wrap;text-shadow:0 1px 4px #000;pointer-events:none}
+#hud{position:absolute;left:0;right:0;bottom:0;display:none;justify-content:space-between;align-items:end;padding:.7em .8em;pointer-events:none;font:600 .75em/1 ui-monospace,Consolas,monospace;letter-spacing:.04em;text-shadow:0 1px 6px #000c}
+.g #hud{display:flex}
+#hud>div{display:flex;gap:.9em;align-items:center;background:#03131c99;border:1px solid #7ff3ff3a;padding:.45em .7em;border-radius:.6em;backdrop-filter:blur(6px)}
+#hud b{color:#7ff3ff;font-weight:800}
+#hud .sep{opacity:.45}
+#hud #boost.on{color:#ffde59}
+#hud #camMode{cursor:pointer;pointer-events:auto}
+#hud #camMode:hover{filter:brightness(1.3)}
+#pm{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:1.1em;padding:1.2em;background:radial-gradient(#03131ce0 30%,#020a0fe8);opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s;z-index:10}
+#pm h2{margin:0;font:900 2em/1 system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#7ff3ff}
+#pmGrid{display:grid;gap:.6em;width:min(26em,90vw)}
+#pmGrid button{width:100%;background:#03222d;color:#e8fbff;box-shadow:inset 0 0 0 1px #7ff3ff55,0 .3em 1em #0006}
+#pmGrid button:hover{background:#0b3a4d}
+#pmGrid .primary{background:linear-gradient(#9ff6ff,#19c3d6);color:#03222d}
+#pmSmall{display:flex;gap:.6em;width:min(26em,90vw);font-size:.8em}
+#pmSmall button{flex:1;background:#e8fbff0d;color:#7ff3ff;box-shadow:inset 0 0 0 1px #7ff3ff33}
+#pmHint{font:600 .7em/1.3 system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#7ff3ff99;text-align:center;max-width:28em}
+#joyL,#joyR{position:absolute;bottom:1.1em;width:110px;height:110px;border-radius:50%;background:#03131c66;border:1.5px solid #7ff3ff33;backdrop-filter:blur(6px);display:none;touch-action:none;z-index:5}
+#joyL{left:.9em}
+#joyR{right:.9em;width:80px;height:110px;border-radius:14px;flex-direction:column;align-items:center;justify-content:center;gap:.2em;padding:.4em 0}
+#joyL i,#joyR i{position:absolute;width:44px;height:44px;border-radius:50%;background:radial-gradient(#7ff3ff,#14a9c4);box-shadow:0 2px 10px #0008, inset 0 -2px #0003;transform:translate(-50%,-50%);left:50%;top:50%;pointer-events:none;transition:transform .05s}
+#joyR i{position:relative;left:auto;top:auto;transform:none;width:34px;height:34px}
+#joyR b{font:800 .6em system-ui;letter-spacing:.1em;color:#7ff3ff}
+#joyL.active i{transition:none}
+#mBtns{position:absolute;bottom:1.1em;left:50%;transform:translateX(-50%);display:none;gap:.6em;z-index:5}
+#mBtns button{width:54px;height:54px;border-radius:50%;background:#03131ccc;border:1.5px solid #7ff3ff55;color:#7ff3ff;font-size:1.1em;padding:0;backdrop-filter:blur(6px)}
+#mBtns button:active{transform:scale(.95)}
+.g #joyL,.g #joyR,.g #mBtns{display:flex}
+@media (pointer:fine){#joyL,#joyR,#mBtns{display:none !important}}
+.paused #joyL,.paused #joyR,.paused #mBtns{opacity:.3;pointer-events:none}
+#compass{width:70px;height:70px;border-radius:50%;border:1.5px solid #7ff3ff55;background:#03131c88;display:grid;place-items:center;position:relative}
+#compass i{position:absolute;width:2px;height:34px;background:linear-gradient(#ff5e5b 50%,#e8fbff 50%);border-radius:1px;transform-origin:50% 50%}
+#compass b{font:800 .55em system-ui;z-index:1}
+#hudDepth{color:#7ff3ff}
+#sonar{position:absolute;left:50%;top:50%;width:300px;height:300px;transform:translate(-50%,-50%);border-radius:50%;border:2px solid #7ff3ff;opacity:0;pointer-events:none;transition:opacity .2s;z-index:4}
+#sonar.on{opacity:.55;animation:ping 1.2s ease-out}
+@keyframes ping{from{transform:translate(-50%,-50%) scale(.2);opacity:.8}to{transform:translate(-50%,-50%) scale(2);opacity:0}}
+#cockpit{position:absolute;inset:0;pointer-events:none;display:none;opacity:.55}
+.g.cockpit #cockpit{display:block}
+#cockpit::before{content:'';position:absolute;inset:0;border:18px solid #0b1a22;border-radius:18px;box-shadow:inset 0 0 40px #000a,mask:radial-gradient(ellipse 78% 72% at 50% 44%,#000 60%,#0000 74%)}
+#cockpit::after{content:'';position:absolute;left:4%;right:4%;top:3%;height:2px;background:linear-gradient(90deg,#0000,#7ff3ff66,#0000)}
+#firstHud{position:absolute;bottom:1.6em;left:50%;transform:translateX(-50%);display:none;gap:1em;background:#020a0fcc;border:1px solid #7ff3ff44;padding:.5em .9em;border-radius:.7em;font:600 .7em ui-monospace;backdrop-filter:blur(8px)}
+.g.cockpit #firstHud{display:flex}
+</style>
+</head>
+<body class=l>
+<canvas id=c></canvas>
+<div id=sonar></div>
+<div id=cockpit></div>
+<div id=m>
+  <h1>Underwater Adventure<span>w/ FKJ</span></h1>
+  <div id=a>
+    <div id=l><div id=p><i id=b></i></div><p id=s>Building the abyss…</p><p id=w hidden>Use Chrome or Edge for optimal experience — WebGPU required</p></div>
+    <div id=g>
+      <button id=d>Dive In — Pilot the Submersible</button>
+      <p id=q><span>Detail</span><button>Low</button><button>Medium</button><button>High</button></p>
+      <div id=k>
+        <div>
+          <i><b>W</b><b>↑</b></i> Forward
+          <i><b>S</b><b>↓</b></i> Reverse
+          <i><b>A</b><b>D</b><b>←</b><b>→</b></i> Steer
+          <i><b>Space</b></i> Ascend
+        </div>
+        <div>
+          <i><b>Ctrl</b></i> Descend
+          <i><b>Shift</b></i> Boost
+          <i><b>C</b></i> Camera
+          <i><b>Esc</b></i> Menu
+        </div>
+      </div>
+      <p id=h>Left stick: move & steer · Right slider: ascend / descend · Boost & Camera buttons</p>
+      <p style="font:.62em/1.4 system-ui;letter-spacing:.06em;text-transform:none;color:#7ff3ffbb;max-width:28em;margin:0 auto">Explore freely — kelp forests, sunken ship, purple grotto, manta rays. No missions. Just dive.</p>
+    </div>
+  </div>
+  <p id=f>
+    <a href=https://github.com/Noniv/abyssal-garden target=_blank><svg viewBox="0 0 16 16"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>Original</a>
+    <a href=https://github.com/fkjarif/underwater-adventure target=_blank><svg viewBox="0 0 16 16"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>Source</a>
+  </p>
+</div>
+<div id=pm>
+  <h2>Paused</h2>
+  <div id=pmGrid>
+    <button class=primary id=pmResume>Resume</button>
+    <button id=pmCamera>Camera: Third-Person</button>
+    <button id=pmRestart>Return to Start</button>
+    <button id=pmSound>Sound: On</button>
+    <button id=pmMain>Main Menu</button>
+  </div>
+  <div id=pmSmall>
+    <button id=pmQuality>Quality: High</button>
+    <button id=pmSonar>Sonar Ping</button>
+  </div>
+  <p id=pmHint>WASD/Arrows steer · Space ascend · Ctrl descend · Shift boost · C camera · H stats · M mute</p>
+</div>
+<button id=o aria-label=Menu>≡</button>
+<pre id=i></pre>
+<div id=hud>
+  <div>
+    <span>DEPTH <b id=hudDepth>—</b> m</span><span class=sep>·</span>
+    <span>SPEED <b id=hudSpeed>—</b> kn</span><span class=sep>·</span>
+    <span id=boost>BOOST <b id=boostOn>○</b></span>
+  </div>
+  <div>
+    <span id=camMode>CHASE</span><span class=sep>·</span>
+    <span id=compass style="width:auto;height:auto;border:none;background:none;padding:0"><b id=hudHdg>—</b></span>
+  </div>
+</div>
+<div id=firstHud><span>DEPTH <b id=fDepth>—</b></span> <span>SPEED <b id=fSpeed>—</b></span> <span>HDG <b id=fHdg>—</b></span></div>
+<div id=joyL><i></i></div>
+<div id=joyR><b>▲</b><i></i><b>▼</b></div>
+<div id=mBtns>
+  <button id=mBoost aria-label=Boost>⚡</button>
+  <button id=mCam aria-label=Camera>◉</button>
+  <button id=mPause aria-label=Pause>Ⅱ</button>
+</div>
+<script>
+/*SCRIPT*/
+</script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+UNDERWATER ADVENTURE w/ FKJ — Master Brief (evolution of Abyssal Garden)
+
+You are an autonomous senior game developer, WebGPU graphics engineer, gameplay programmer, technical artist, UI/UX designer and QA engineer.
+
+Your task is to transform the existing Abyssal Garden project by Noniv into a polished, browser-based 3D underwater exploration game titled: Underwater Adventure w/ FKJ.
+
+ORIGINAL: https://github.com/Noniv/abyssal-garden
+Original prompt: https://github.com/Noniv/abyssal-garden/blob/main/prompt.txt
+Preserve original MIT license + attribution. Work on separate branch, keep history.
+
+CORE TECHNICAL CONSTRAINTS
+- Primary renderer: WebGPU, WGSL shaders
+- Procedural generation, no external textures/models/sounds
+- Single self-contained index.html built from modular source via Node build
+- Preserve WebGPU-only architecture (no Three.js/Babylon), single-file distribution
+- Zero per-frame allocations, preallocated buffers, minimal CPU→GPU transfers
+- Adaptive quality system retained
+
+CORE EXPERIENCE
+Small, futuristic single-person research submersible for open-ended free exploration. No missions, combat, timers, survival meters. Explore ocean, caves, kelp forests, arches, ship, grotto. Feel free, weighty underwater movement.
+
+PRESERVE ABYSSAL GARDEN WORLD (extremely important)
+Retain: kelp forests with animated leaves, gold/green sparkles, cyan→deep-blue gradients, depth fog, sunlight/god rays, caustics, canyons/arches/tunnels/overhangs, floating boulders, purple/pink foliage, magenta ground cover, barrel sponges/coral, manta rays/fish schools, bubbles/particles, sunken ship, whale-fluke sculpture, purple grotto, soundscape. Do not remove elements to simplify vehicle. World must remain recognisable.
+
+SUBMERSIBLE DESIGN
+Procedurally generated real 3D object (not sprite):
+- Streamlined hull, front viewport/canopy, front headlights, nav lights, side propulsion pods, vertical thrusters, rear prop, vents/details, restrained colour scheme contrasting blue
+- Animations: propellers spin when moving, nav lights visible, headlights illuminate terrain, smooth acceleration/steering
+- Visible in third-person, consistent proportions across cameras
+
+VEHICLE PHYSICS (delta-time, stable)
+- Forward/reverse, left/right steering, ascend/descend, acceleration/deceleration, gradual turning, momentum/inertia, speed limiting, smooth transitions, vertical independent of horizontal
+- Curves: max forward ~11 kn (17 boosted), reverse ~5.5, vertical ~7.5, acceleration/turn/drag tuned for weighty fluid feel
+- Use existing terrain collision extended: capsule ~1.15 m, slide along rock, no clipping, preserve non-solid behaviours (kelp pass-through), smooth resolution
+
+CONTROLS — DESKTOP
+W/↑ forward, S/↓ reverse, A/← left, D/→ right, Space ascend, Ctrl descend, Shift boost, C camera, M sound, H stats, Esc pause/menu. Continuous handling, prevent scroll, no conflict with menus.
+
+CONTROLS — MOBILE (first-class)
+Left joystick (forward/back + steer), right vertical slider (ascend/descend), Boost/Camera/Pause buttons, multitouch, transparent comfy targets, no scroll/zoom interference, responsive portrait→landscape (CSS rotation, no forced lock).
+
+CAMERA SYSTEM
+Mode A third-person (default): behind+sightly above, smooth follow, adjustable distance, no snapping, visible vehicle, terrain-aware.
+Mode B first-person cockpit: through viewport, headlights visible, depth/speed/compass, subtle framing, minimal obstruction.
+Toggle C / button, smooth transitions, movement preserved, no reset.
+
+INTERFACE
+Main menu: title UNDERWATER ADVENTURE w/ FKJ, Play/Dive In, controls, settings, audio, quality, over blurred live scene.
+HUD (translucent, minimal): depth, speed (knots), heading, boost, camera mode, pause, sound.
+Pause: Resume, Camera, Audio, Graphics, Controls ref, Restart, Main Menu. Pause freezes physics, handles tab visibility.
+
+AUDIO
+Preserve procedural ambience (rumble, whale calls, chimes, bubbles). Add: propulsion hum (pitch with thrust), thruster activation, boost. Responds to acceleration. Respect autoplay (init on interaction). Independent volume.
+
+GAMEPLAY
+Free exploration only: no missions/combat/enemies/survival/time/collectibles. World bounded but boundaries not visible from normal areas. Preserve 6 viewpoints as ref but no forced teleport. Optional sonar (ping, circular scan, highlight POIs) if performance permits — not delaying core.
+
+PERFORMANCE & COMPATIBILITY
+Preserve adaptive resolution, LOD, draw distance, device-sensitive quality, GPU buffer efficiency, frame pacing. Desktop target Win11 Chrome/Edge 1920×1080/2560×1440 60+ fps; mobile adaptive (reduce foliage/resolution/shadows) stable 30 fps, aim 60. Never assume unlimited GPU.
+
+QA
+Visual: check kelp forest, open water, ship, arches/canyons, grotto, manta/fish in both cameras for clipping, proportions, lighting, z-fighting, fog, collision, HUD, boundaries.
+Functional: test all vehicle, camera, desktop/mobile, performance metrics (average, 99th, max, GPU time, memory, load).
+Development workflow incremental (analysis → sub → controls → camera → collision → mobile → HUD → audio → perf → QA → final build). Final deliverables: modular source, prompt.txt, README, working index.html, desktop/mobile controls, 2 cameras, physics, collision, menus/HUD, preserved world, perf & visual reports, instructions.
+
+Acceptance: original world recognisable, real 3D sub with independent physics, keyboard + joystick + multitouch + ascend/descend + 2 cameras + smooth transitions + terrain collision + animations + procedural audio + vehicle audio + HUD + menus + pause + adaptive graphics + no console errors + production build works.
+
+Creative direction: dreamlike peaceful surreal atmosphere, small sub through kelp, rays overhead, arches, ship, grotto — alive, responsive, immersive.
+
+ORIGINAL PROMPT (preserved):
+Build a real-time fantasy underwater scene that runs in the browser. It only needs to look beautiful and let me fly a free camera through it.
+
+PRIORITIES (in this order when they conflict)
+1. Visual quality
+2. Stable frame pacing at the target spec
+3. Small bundle size
+
+CONSTRAINTS
+- No Three.js/Babylon.js or other engines.
+- WebGPU rendered.
+- Everything procedural: no texture/model files. Deliverable is a single self-contained index.html. Report minified size.
+- Zero per-frame JS allocations (no GC stutter). Preallocate all buffers.
+
+TARGET
+- Windows 11 25H2, Chrome 157, RTX 5070 Ti, Ryzen 7800X3D, 180 Hz monitor
+- 2560×1440 at full resolution. GPU frame time ≤ 11 ms average, no frame > 16.7 ms during a scripted 60 s fly-through.
+
+SCENE
+- Dense, towering kelp columns with sparkling green/gold specks, swaying
+- Strong depth fog/absorption: cyan near the surface → deep blue in the distance
+- God rays, animated caustics, wavy surface visible from below
+- Rock canyons, arches and overhangs; floating boulders
+- Iridescent purple/pink foliage, magenta ground cover, barrel sponges, coral
+- Animated life: manta rays, fish schools, rising bubbles, drifting particles
+- Set pieces: a sunken ship hull, a stone whale-fluke sculpture
+- World: bounded, but the boundaries can't be visible from the starting area
+
+CONTROLS (original)
+WASD move, mouse look (pointer lock), Q/E up/down, Shift to accelerate
+
+VERIFICATION
+- Visual critic: 6 fixed poses @2560×1440 + fly-through recording, iterate until nothing above minor
+- Performance: GPU timestamps + frame-time log, report average, 99th, max
+
+DONE WHEN: both verification gates pass. Deliver index.html, bundle size, perf report, critic review.
